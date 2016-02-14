@@ -15,51 +15,30 @@
 						http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
 						http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
-	<!-- Zip File Polling -->
-	<int-file:inbound-channel-adapter id="zipFilesIn" 
-		directory="${in.zip.file.path}">
-		<int:poller id="pollerZipped" fixed-rate="5000" max-messages-per-poll="10" />
+	<!-- File Polling -->
+	<int-file:inbound-channel-adapter id="filesInChannel"
+		directory="${in.file.path}">
+		<int:poller id="poller" fixed-rate="100" task-executor="executor" />
 	</int-file:inbound-channel-adapter>
-
-	<!-- Output Unzipped -->
-	<int-file:outbound-channel-adapter
-		id="unzipFilesOut" 
-		directory="${out.unzip.file.path}"
-		delete-source-files="false" />
-
-	<!-- UZip files -->
-	<int:chain id="unzipFiles" 
-		input-channel="zipFilesIn"
-		output-channel="unzipFilesOut">
-		<int-zip:unzip-transformer result-type="BYTE_ARRAY" />
-		<int:splitter method="splitUnzippedMap">
-			<bean
-				class="org.springframework.integration.zip.splitter.UnZipResultSplitter" />
-		</int:splitter>
-	</int:chain>
+	<!-- Thread pool -->
+	<task:executor id="executor" pool-size="10" />
 	
-
-	<!-- Data File Polling -->
-<!-- 	<int-file:inbound-channel-adapter id="filesInChannel" -->
-<!-- 		directory="${out.unzip.file.path}"> -->
-<!-- 		<int:poller id="poller" fixed-delay="5000" fixed-rate="100" task-executor="executor" /> -->
-<!-- 	</int-file:inbound-channel-adapter> -->
-<!-- 	<task:executor id="executor" pool-size="10" /> -->
-
-	<!-- logging Out -->
-	<!-- <int:logging-channel-adapter id="logger" -->
-	<!-- level="INFO" /> -->
+	<!-- Filter .json -->
+	<int:filter input-channel="filesInChannel"
+				output-channel="jsonInChannel"
+				expression="payload.getName().substring(payload.getName().lastIndexOf('.')).equals('.json')"/>
 
 	<!-- MongoDB -->
-	<mongo:db-factory id="mongoDbFactory" host="${mongodb.host}"
-		dbname="${mongodb.database}" username="${mongodb.username}" password="${mongodb.password}" />
-
-	<!-- <mongo:template id="mongoTemplate" db-factory-ref="mongoDbFactory" 
-		/> -->
+	<mongo:db-factory id="mongoDbFactory" 
+		host="${mongodb.host}"
+		dbname="${mongodb.database}" 
+		username="${mongodb.username}" 
+		password="${mongodb.password}" />
 
 	<!-- add direct -->
 	<int-mongodb:outbound-channel-adapter
-		id="mongodbOutChannel" collection-name="${mongodb.collection}"
+		id="mongodbOutChannel" 
+		collection-name="${mongodb.collection}"
 		mongodb-factory="mongoDbFactory" />
 
 	<!-- Output channel -->
@@ -73,7 +52,7 @@
 	<!-- </int:service-activator> -->
 
 	<!-- Splitter -->
-	<int:splitter input-channel="filesInChannel"
+	<int:splitter input-channel="jsonInChannel"
 		output-channel="mongodbOutChannel" ref="fileSplitter" method="split" />
 	<bean id="fileSplitter" class="com.bts.ingestion.file.FileSplitter" />
 
