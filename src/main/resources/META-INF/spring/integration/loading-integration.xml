@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file"
+	xmlns:int-mongodb="http://www.springframework.org/schema/integration/mongodb"
+	xmlns:int-zip="http://www.springframework.org/schema/integration/zip"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+						http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+						http://www.springframework.org/schema/integration/mongodb http://www.springframework.org/schema/integration/mongodb/spring-integration-mongodb.xsd
+						http://www.springframework.org/schema/integration/zip http://www.springframework.org/schema/integration/zip/spring-integration-zip.xsd
+						http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+						http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
+
+	<!-- File Polling -->
+	<int-file:inbound-channel-adapter id="filesInChannel"
+		directory="${in.file.path}">
+		<int:poller id="poller" fixed-rate="100" task-executor="executor" />
+	</int-file:inbound-channel-adapter>
+	<!-- Thread pool -->
+	<task:executor id="executor" pool-size="10" />
+
+	<!-- A router to route different files to different channels using expression -->
+	<!-- <int:router input-channel="filesInChannel" -->
+	<!-- expression="payload.getName().substring(payload.getName().lastIndexOf('.'))"> -->
+	<!-- <int:mapping value=".gz" channel="tgzFilterChannel" /> -->
+	<!-- <int:mapping value=".json" channel="toMongoDBAdapter" /> -->
+	<!-- </int:router> -->
+
+	<!-- UZip files -->
+	<!-- <int:chain id="unzipFiles" input-channel="zipFilesIn" -->
+	<!-- output-channel="decompressedFilesOut"> -->
+	<!-- <int-zip:unzip-transformer result-type="BYTE_ARRAY" /> -->
+	<!-- <int:splitter method="splitUnzippedMap"> -->
+	<!-- <bean -->
+	<!-- class="org.springframework.integration.zip.transformer.splitter.UnZipResultSplitter" 
+		/> -->
+	<!-- </int:splitter> -->
+	<!-- </int:chain> -->
+
+	<!-- logging Out -->
+	<!-- <int:logging-channel-adapter id="logger" -->
+	<!-- level="INFO" /> -->
+
+	<!-- MongoDB -->
+	<mongo:db-factory id="mongoDbFactory" host="${mongodb.host}"
+		dbname="${mongodb.database}" username="${mongodb.username}" password="${mongodb.password}" />
+
+	<!-- <mongo:template id="mongoTemplate" db-factory-ref="mongoDbFactory" 
+		/> -->
+
+	<!-- add direct -->
+	<int-mongodb:outbound-channel-adapter
+		id="mongodbOutChannel" collection-name="${mongodb.collection}"
+		mongodb-factory="mongoDbFactory" />
+
+	<!-- Output channel -->
+	<!-- <int:channel id="filesOutChannel"> -->
+	<!-- <int:queue /> -->
+	<!-- </int:channel> -->
+	<!-- Get name -->
+	<!-- <int:service-activator input-channel="filesInChannel" -->
+	<!-- output-channel="filesOutChannel"> -->
+	<!-- <bean class="com.bts.ingestion.file.FileProcessor" /> -->
+	<!-- </int:service-activator> -->
+
+	<!-- Splitter -->
+	<int:splitter input-channel="filesInChannel"
+		output-channel="mongodbOutChannel" ref="fileSplitter" method="split" />
+	<bean id="fileSplitter" class="com.bts.ingestion.file.FileSplitter" />
+
+	<!-- <int:transformer input-channel="sourceExtractor" -->
+	<!-- output-channel="twitterOut" expression="payload.getText()" /> -->
+
+	<!-- <int:logging-channel-adapter id="twitterOut" -->
+	<!-- level="INFO" /> -->
+
+</beans>
