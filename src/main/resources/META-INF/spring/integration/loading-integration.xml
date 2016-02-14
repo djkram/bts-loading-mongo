@@ -15,31 +15,36 @@
 						http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
 						http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
-	<!-- File Polling -->
-	<int-file:inbound-channel-adapter id="filesInChannel"
-		directory="${in.file.path}">
-		<int:poller id="poller" fixed-rate="100" task-executor="executor" />
+	<!-- Zip File Polling -->
+	<int-file:inbound-channel-adapter id="zipFilesIn" 
+		directory="${in.zip.file.path}">
+		<int:poller id="pollerZipped" fixed-rate="5000" max-messages-per-poll="10" />
 	</int-file:inbound-channel-adapter>
-	<!-- Thread pool -->
-	<task:executor id="executor" pool-size="10" />
 
-	<!-- A router to route different files to different channels using expression -->
-	<!-- <int:router input-channel="filesInChannel" -->
-	<!-- expression="payload.getName().substring(payload.getName().lastIndexOf('.'))"> -->
-	<!-- <int:mapping value=".gz" channel="tgzFilterChannel" /> -->
-	<!-- <int:mapping value=".json" channel="toMongoDBAdapter" /> -->
-	<!-- </int:router> -->
+	<!-- Output Unzipped -->
+	<int-file:outbound-channel-adapter
+		id="unzipFilesOut" 
+		directory="${out.unzip.file.path}"
+		delete-source-files="false" />
 
 	<!-- UZip files -->
-	<!-- <int:chain id="unzipFiles" input-channel="zipFilesIn" -->
-	<!-- output-channel="decompressedFilesOut"> -->
-	<!-- <int-zip:unzip-transformer result-type="BYTE_ARRAY" /> -->
-	<!-- <int:splitter method="splitUnzippedMap"> -->
-	<!-- <bean -->
-	<!-- class="org.springframework.integration.zip.transformer.splitter.UnZipResultSplitter" 
-		/> -->
-	<!-- </int:splitter> -->
-	<!-- </int:chain> -->
+	<int:chain id="unzipFiles" 
+		input-channel="zipFilesIn"
+		output-channel="unzipFilesOut">
+		<int-zip:unzip-transformer result-type="BYTE_ARRAY" />
+		<int:splitter method="splitUnzippedMap">
+			<bean
+				class="org.springframework.integration.zip.splitter.UnZipResultSplitter" />
+		</int:splitter>
+	</int:chain>
+	
+
+	<!-- Data File Polling -->
+<!-- 	<int-file:inbound-channel-adapter id="filesInChannel" -->
+<!-- 		directory="${out.unzip.file.path}"> -->
+<!-- 		<int:poller id="poller" fixed-delay="5000" fixed-rate="100" task-executor="executor" /> -->
+<!-- 	</int-file:inbound-channel-adapter> -->
+<!-- 	<task:executor id="executor" pool-size="10" /> -->
 
 	<!-- logging Out -->
 	<!-- <int:logging-channel-adapter id="logger" -->
