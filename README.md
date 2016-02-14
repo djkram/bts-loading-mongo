@@ -17,3 +17,5 @@
 0. Connect SSH in Primary
 
 https://docs.bitnami.com/google/infrastructure/mongodb/
+
+	gcloud compute copy-files target/demo-load-mongo-0.0.1-SNAPSHOT.jar instance-bts-1:~/

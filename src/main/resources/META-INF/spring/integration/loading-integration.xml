@@ -41,23 +41,10 @@
 		collection-name="${mongodb.collection}"
 		mongodb-factory="mongoDbFactory" />
 
-	<!-- Output channel -->
-	<!-- <int:channel id="filesOutChannel"> -->
-	<!-- <int:queue /> -->
-	<!-- </int:channel> -->
-	<!-- Get name -->
-	<!-- <int:service-activator input-channel="filesInChannel" -->
-	<!-- output-channel="filesOutChannel"> -->
-	<!-- <bean class="com.bts.ingestion.file.FileProcessor" /> -->
-	<!-- </int:service-activator> -->
-
 	<!-- Splitter -->
 	<int:splitter input-channel="jsonInChannel"
 		output-channel="mongodbOutChannel" ref="fileSplitter" method="split" />
 	<bean id="fileSplitter" class="com.bts.ingestion.file.FileSplitter" />
-
-	<!-- <int:transformer input-channel="sourceExtractor" -->
-	<!-- output-channel="twitterOut" expression="payload.getText()" /> -->
 
 	<!-- <int:logging-channel-adapter id="twitterOut" -->
 	<!-- level="INFO" /> -->

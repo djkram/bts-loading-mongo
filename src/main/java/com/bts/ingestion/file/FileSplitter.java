@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * @author bdigital_mob
+ * @author mplanaguma
  *
  */
 public class FileSplitter {
