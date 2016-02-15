@@ -82,6 +82,20 @@ or open via Web.
 - Got to Project: bts-loading-mongo
 - Check the Classes on: src/main/java
 - Follow the instructions on: src/main/resopurces > META-INF/spring/integration/loading-integration.xml
+
+	<!-- GO TO : https://gist.github.com/djkram/e846ac38fed4f8231cdd -->
+
+	<!-- PASTE HERE: Step 1: Polling Files -->
+	<!-- Appears file names on the console ??? -->
+	
+
+	<!-- PASTE HERE: Step 2: Message Splitter -->
+	<!-- Appears tweets on the console ??? -->
+
+	
+	<!-- PASTE HERE: Step 3: MongoDB Loading -->
+	<!-- Tweets have been loaded on MongoDB ??? -->
+	
 - Execute:
 
 	mvn clean instal package
@@ -99,3 +113,10 @@ or open via Web.
 	
 	$ mongo bts --username bts_user -p
 	> db.bts.tweets.count()
+	
+### ADVANCED functionality (optional)
+
+ - Create a Filter who check if the tweet already exist in the DB and avoid the duplicates.
+ - See: [http://docs.spring.io/spring-integration/reference/htmlsingle/#filter-xml](http://docs.spring.io/spring-integration/reference/htmlsingle/#filter-xml)
+ - See: [http://docs.spring.io/spring-integration/api/org/springframework/integration/core/MessageSelector.html](http://docs.spring.io/spring-integration/api/org/springframework/integration/core/MessageSelector.html)
+ - See: [http://www.baeldung.com/queries-in-spring-data-mongodb](http://www.baeldung.com/queries-in-spring-data-mongodb)
