@@ -20,6 +20,21 @@
 	
 	<!-- PASTE HERE: Step 1: Polling Files -->
 	<!-- Appears file names on the console ??? -->
+	<int-file:inbound-channel-adapter id="filesInChannel"
+		directory="${in.file.path}">
+		<int:poller id="poller" fixed-rate="100" task-executor="executor" />
+	</int-file:inbound-channel-adapter>
+	<!-- Thread pool -->
+	<task:executor id="executor" pool-size="10" />
+
+	<!-- Filter .json -->
+	<int:filter input-channel="filesInChannel" output-channel="jsonInChannel"
+		expression="payload.getName().substring(payload.getName().lastIndexOf('.')).equals('.json')" />
+		
+	<!-- REMOVE THIS IN STEP 2 -->
+	<int:logging-channel-adapter id="jsonInChannel"
+		level="INFO" />
+	
 	
 
 	<!-- PASTE HERE: Step 2: Message Splitter -->
