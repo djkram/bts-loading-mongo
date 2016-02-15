@@ -40,16 +40,22 @@ or open via Web.
 - Create Admin user:
 
 	$ mongo
-	> db = db.getSiblingDB('admin')
-	> db.createUser( { user: "root", pwd: "YOURPASSWORD", roles: [ "readWriteAnyDatabase", "userAdminAnyDatabase", "dbAdminAnyDatabase", "clusterAdmin" ]} )
-	> exit
+	
+	db = db.getSiblingDB('admin')
+	
+	db.createUser( { user: "root", pwd: "YOURPASSWORD", roles: [ "readWriteAnyDatabase", "userAdminAnyDatabase", "dbAdminAnyDatabase", "clusterAdmin" ]} )
+	
+	exit
 
 - Create App Database:
 	
 	$ mongo admin --username root --password YOURPASSWORD
-	> db = db.getSiblingDB('YOUR_DATABASE_NAME')
-	> db.createUser( { user: "YOUR_DATABADE_USER", pwd: "YOUR_BD_PASSWORD", roles: [ "readWrite", "dbAdmin" ]} )
-	> exit
+	
+	db = db.getSiblingDB('YOUR_DATABASE_NAME')
+	
+	db.createUser( { user: "YOUR_DATABADE_USER", pwd: "YOUR_BD_PASSWORD", roles: [ "readWrite", "dbAdmin" ]} )
+	
+	exit
 	
 - Remember the User/Password
 	
