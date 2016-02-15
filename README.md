@@ -81,6 +81,7 @@ or open via Web.
 
 - Got to Project: bts-loading-mongo
 - Check the Classes on: src/main/java
+- Unzip: data/TwitterStream-2015.tar.gz
 - Follow the instructions on: src/main/resopurces > META-INF/spring/integration/loading-integration.xml
 
 	<!-- GO TO : https://gist.github.com/djkram/e846ac38fed4f8231cdd -->
