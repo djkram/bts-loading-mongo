@@ -1,7 +1,9 @@
-# Data Ingestion II - Load Data from Files to MongoDB
+# Data Ingestion II - Data Storing
 
-This is the guide for the hands on Session number 6 of the BigData module on BTS Master.
-Follow the next steps:
+This is the guide for the hands on Session #6 of the BigData module on BTS Master.
+We will load a big amount of data from F¡files to a MongoDB Cluster.
+
+Follow the guide:
 
 
 ### Clone this project on your STS Studio
@@ -144,7 +146,11 @@ Check data loading in MongoDB
 	$ mongo bts --username bts_user -p
 	> db.bts.tweets.count()
 	
-### ADVANCED homework (optional)
+### HOMEWORK
+
+- **Load all the content of the files in your mongoDB Cluster and sent the credentials to the teacher.**
+	
+### ADVANCED HOMEWORK (optional)
 
  - Create a Filter who check if the tweet already exist in the DB and avoid the duplicates.
  - See: [http://docs.spring.io/spring-integration/reference/htmlsingle/#filter-xml](http://docs.spring.io/spring-integration/reference/htmlsingle/#filter-xml)
