@@ -6,13 +6,15 @@ Follow the next steps:
 
 ### Clone this project on your STS Studio
 
+Clone in terminal
+
 	git clone https://github.com/djkram/bts-loading-mongo.git
 	
-Or
+Clone in STS
 
 	File > Import > Git > Projects from Git > Clone Uri
 
-### Create VMs on Google Cloud 
+### Set UP VMs on Google Cloud 
 
 0. Go to: [https://console.cloud.google.com](https://console.cloud.google.com)
 0. Create a Project (ex: BTS-BigData)
@@ -30,14 +32,19 @@ Or
 
 ##### Configure MongoDB
 
-- Reference documentation: [https://docs.bitnami.com/google/infrastructure/mongodb/](https://docs.bitnami.com/google/infrastructure/mongodb)
-- Open SSH:
+Reference documentation of MongoDB Set up: [https://docs.bitnami.com/google/infrastructure/mongodb/](https://docs.bitnami.com/google/infrastructure/mongodb)
 
-	gcloud compute --project "<name_project>" ssh --zone "<zone>" "<name_primary-instance-mongo>"
+Open SSHin MongoDB cluster primary node:
+
+	$ gcloud compute --project "<name_project>" ssh --zone "<your_zone>" "<name_primary-instance-mongo>"
+
+Example:
+
+	$ gcloud compute --project "bts-test-1210" ssh --zone "europe-west1-d" "mongodbbts-instance-1"
 	
-or open via Web.
+or open SSH via Web.
 
-- Create Admin user:
+Create admin user (root) in MongoDB:
 
 	$ mongo
 	
@@ -47,40 +54,41 @@ or open via Web.
 	
 	exit
 
-- Create App Database:
+Create your own user and database:
 	
-	$ mongo admin --username root --password YOURPASSWORD
+	$ mongo admin --username root --password SET_YOUR_PASSWORD
 	
-	db = db.getSiblingDB('YOUR_DATABASE_NAME')
+	> db = db.getSiblingDB('SET_YOUR_DATABASE_NAME')
 	
-	db.createUser( { user: "YOUR_DATABADE_USER", pwd: "YOUR_BD_PASSWORD", roles: [ "readWrite", "dbAdmin" ]} )
+	>db.createUser( { user: "SET_YOUR_DATABADE_USER", pwd: "SET_YOUR_BD_PASSWORD", roles: [ "readWrite", "dbAdmin" ]} )
 	
 	exit
 	
-- Remember the User/Password
-	
+Never user "root" as normal user to access on a database	
+Remember the User/Password
+
 
 #### Create Data loading instance
-- Go to: Compute Engine
-- Create Instance
+Go to: Compute Engine
+Create Instance
 
 ![alt Create Instance](img/create-instance.png)
 
-- Open SSH
+Open SSH
 
-	gcloud compute --project "<name_project>" ssh --zone "<zone>" "<namer_instance>"
+	$ gcloud compute --project "<name_project>" ssh --zone "<zone>" "<namer_instance>"
 	
 or open via Web.
 
 ##### Install dependencies
-	sudo apt-get update
-	sudo apt-get install openjdk-8-jre
+	$ sudo apt-get update
+	$ sudo apt-get install openjdk-8-jre
 
 ##### Download data
-	mkdir data
-	cd data
-	wget https://s3-eu-west-1.amazonaws.com/eurecat-dataset-historic/twitter/eurecat-bts-dataset-twitter-2015.tar.gz
-	tar zxvf eurecat-bts-dataset-twitter-2015.tar.gz
+	$ mkdir data
+	$ cd data
+	$ wget https://s3-eu-west-1.amazonaws.com/eurecat-dataset-historic/twitter/eurecat-bts-dataset-twitter-2015.tar.gz
+	$ tar zxvf eurecat-bts-dataset-twitter-2015.tar.gz
 	
 
 ### Develop your Spring Integration project on STS
@@ -105,18 +113,18 @@ or open via Web.
 	
 - Execute:
 
-	mvn clean instal package
+	$ mvn clean instal package
 	
-- Copy your application in Google Cloud load data instance
+Copy your application in Google Cloud load data instance
  
-	gcloud compute copy-files target/bts-loading-mongo-0.0.1-SNAPSHOT.jar data-load-instance:~/
+	$ gcloud compute copy-files target/bts-loading-mongo-0.0.1-SNAPSHOT.jar data-load-instance:~/
 
-- Open SSH on "data-load-instance"
-- Execute Application
+Open SSH on "data-load-instance"
+Execute Application
  
-	java -jar bts-loading-mongo-0.0.1-SNAPSHOT.jar --in.file.path=file:dataeurecat-bts-dataset-twitter
+	$ java -jar bts-loading-mongo-0.0.1-SNAPSHOT.jar --in.file.path=file:dataeurecat-bts-dataset-twitter
 
-- Check data loading in MongoDB
+Check data loading in MongoDB
 	
 	$ mongo bts --username bts_user -p
 	> db.bts.tweets.count()
