@@ -96,6 +96,7 @@ or open via Web.
 - Got to Project: bts-loading-mongo
 - Check the Classes on: src/main/java
 - Unzip: data/TwitterStream-2015.tar.gz
+
 - Follow the instructions on: src/main/resopurces > META-INF/spring/integration/loading-integration.xml
 
 	<!-- GO TO : https://gist.github.com/djkram/e846ac38fed4f8231cdd -->
@@ -111,25 +112,39 @@ or open via Web.
 	<!-- PASTE HERE: Step 3: MongoDB Loading -->
 	<!-- Tweets have been loaded on MongoDB ??? -->
 	
-- Execute:
+Build your application using Maven:
 
-	$ mvn clean instal package
+in terminal:
+
+	$ mvn clean install package
+	
+in STS:
+
+	Run AS > Maven Build... > Goals: "clean install package" > Run
 	
 Copy your application in Google Cloud load data instance
+Example:
  
-	$ gcloud compute copy-files target/bts-loading-mongo-0.0.1-SNAPSHOT.jar data-load-instance:~/
+	$ gcloud compute --project "bts-test-1210" copy-files target/demo-load-mongo-0.0.1-SNAPSHOT.jar data-load-instance:~/
 
 Open SSH on "data-load-instance"
-Execute Application
+
+	$ gcloud compute --project "bts-test-1210" ssh --zone "europe-west1-d" "data-load-instance"
+
+Execute Application:
  
 	$ java -jar bts-loading-mongo-0.0.1-SNAPSHOT.jar --in.file.path=file:dataeurecat-bts-dataset-twitter
+	
+If you want to run the aplication in backgraund and close the terminal without kill the aplication, you can user "screen"
+
+Example: [http://www.greplinux.net/2013/04/screen-how-to-run-processes-in.html](http://www.greplinux.net/2013/04/screen-how-to-run-processes-in.html)
 
 Check data loading in MongoDB
 	
 	$ mongo bts --username bts_user -p
 	> db.bts.tweets.count()
 	
-### ADVANCED functionality (optional)
+### ADVANCED homework (optional)
 
  - Create a Filter who check if the tweet already exist in the DB and avoid the duplicates.
  - See: [http://docs.spring.io/spring-integration/reference/htmlsingle/#filter-xml](http://docs.spring.io/spring-integration/reference/htmlsingle/#filter-xml)
